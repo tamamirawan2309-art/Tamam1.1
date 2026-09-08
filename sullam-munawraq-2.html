@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Sullam — Penguji Hafalan Matan Sullam Munawwaraq</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Scheherazade+New:wght@400;700&family=Zain:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --parchment:#EFE6D3;
+    --parchment-2:#E5D9BF;
+    --ink:#2B2318;
+    --ink-soft:#5B4E3A;
+    --teal:#1F5C4D;
+    --teal-deep:#153F35;
+    --gold:#AC7D2E;
+    --line:#C9B994;
+    --card:#F7F1E2;
+    --danger:#8C3B2E;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 500px at 50% -10%, rgba(172,125,46,0.10), transparent 60%),
+      var(--parchment);
+    color:var(--ink);
+    font-family:'Zain',sans-serif;
+    min-height:100vh;
+    padding-bottom:40px;
+  }
+  .arabic{ font-family:'Scheherazade New','Amiri',serif; direction:rtl; }
+
+  header{
+    padding:28px 20px 20px;
+    text-align:center;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(31,92,77,0.06), transparent);
+  }
+  header .kicker{
+    font-family:'Amiri',serif;
+    direction:rtl;
+    font-size:1.9rem;
+    color:var(--teal-deep);
+    line-height:1.3;
+  }
+  header h1{
+    margin:6px 0 4px;
+    font-size:1.15rem;
+    font-weight:800;
+    letter-spacing:0.2px;
+    color:var(--ink);
+  }
+  header p{
+    margin:0;
+    font-size:0.85rem;
+    color:var(--ink-soft);
+  }
+
+  nav.tabs{
+    display:flex;
+    overflow-x:auto;
+    gap:6px;
+    padding:14px 16px 6px;
+    max-width:640px;
+    margin:0 auto;
+    scrollbar-width:none;
+  }
+  nav.tabs::-webkit-scrollbar{display:none;}
+  nav.tabs button{
+    flex:0 0 auto;
+    background:transparent;
+    border:1px solid var(--line);
+    color:var(--ink-soft);
+    padding:8px 14px;
+    border-radius:999px;
+    font-family:'Zain',sans-serif;
+    font-size:0.88rem;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  nav.tabs button.active{
+    background:var(--teal);
+    border-color:var(--teal);
+    color:#fff;
+  }
+
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:10px 16px 20px;
+  }
+  .panel{display:none;}
+  .panel.active{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px 18px;
+    margin-top:14px;
+    box-shadow:0 1px 0 rgba(43,35,24,0.04);
+  }
+  .card.hidden-answer{position:relative;}
+
+  .bait-no{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:34px;
+    height:34px;
+    padding:0 8px;
+    border-radius:8px;
+    background:var(--teal);
+    color:#fff;
+    font-weight:800;
+    font-size:0.95rem;
+    font-family:'Zain',sans-serif;
+  }
+  .fasl-tag{
+    font-size:0.72rem;
+    color:var(--teal-deep);
+    background:rgba(31,92,77,0.10);
+    border:1px solid rgba(31,92,77,0.25);
+    padding:3px 9px;
+    border-radius:999px;
+    margin-bottom:8px;
+    display:inline-block;
+  }
+  .bait-text{
+    margin-top:12px;
+    font-size:1.65rem;
+    line-height:2.5;
+    text-align:center;
+    color:var(--ink);
+  }
+  .bait-text .shatr{display:block;}
+  .bait-text .sep{color:var(--gold);font-size:1.1rem;margin:0 8px;}
+
+  .meta-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+
+  .btn{
+    border:none;
+    border-radius:10px;
+    padding:12px 16px;
+    font-family:'Zain',sans-serif;
+    font-weight:800;
+    font-size:0.95rem;
+    cursor:pointer;
+    transition:transform .1s ease, opacity .15s ease;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn-primary{background:var(--teal);color:#fff;}
+  .btn-ghost{background:transparent;color:var(--teal-deep);border:1px solid var(--line);}
+  .btn-gold{background:var(--gold);color:#fff;}
+  .btn-row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+  .btn-row .btn{flex:1;min-width:110px;}
+
+  input[type=text], input[type=number]{
+    width:100%;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-family:'Zain',sans-serif;
+    font-size:1rem;
+    color:var(--ink);
+  }
+  input.arabic-input{font-family:'Scheherazade New',serif;direction:rtl;font-size:1.3rem;}
+  label.field-label{
+    display:block;
+    font-size:0.8rem;
+    color:var(--ink-soft);
+    margin:14px 0 6px;
+    font-weight:700;
+  }
+
+  .helper{font-size:0.82rem;color:var(--ink-soft);line-height:1.5;margin-top:6px;}
+  .stat-strip{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+    font-size:0.8rem;
+    color:var(--ink-soft);
+  }
+  .stat-strip b{color:var(--ink);}
+
+  .result-list{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
+  .result-item{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:4px solid var(--teal);
+    border-radius:10px;
+    padding:12px 14px;
+  }
+  .result-item .rno{font-weight:800;color:var(--teal-deep);font-size:0.85rem;margin-bottom:6px;}
+  .result-item .rtext{font-family:'Scheherazade New',serif;direction:rtl;font-size:1.35rem;line-height:2;}
+  mark{background:rgba(172,125,46,0.35);color:inherit;border-radius:3px;padding:0 2px;}
+
+  .empty-note{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:0.88rem;
+    padding:20px 10px;
+  }
+
+  .reveal-blur{
+    filter:blur(7px);
+    user-select:none;
+    transition:filter .2s ease;
+  }
+  .reveal-blur.shown{filter:none;}
+
+  .flash{
+    text-align:center;
+    padding:4px 0 0;
+  }
+  .flash .num-big{
+    font-size:0.85rem;
+    color:var(--ink-soft);
+    font-weight:700;
+  }
+
+  .badge-correct{color:#1F5C4D;font-weight:800;}
+  .badge-wrong{color:var(--danger);font-weight:800;}
+
+  select{
+    width:100%;
+    padding:12px 14px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-family:'Zain',sans-serif;
+    font-size:0.95rem;
+    color:var(--ink);
+  }
+
+  .progress-wrap{
+    height:6px;
+    background:var(--parchment-2);
+    border-radius:99px;
+    overflow:hidden;
+    margin-top:10px;
+  }
+  .progress-bar{height:100%;background:var(--teal);border-radius:99px;transition:width .2s ease;}
+
+  footer{
+    text-align:center;
+    font-size:0.75rem;
+    color:var(--ink-soft);
+    padding:20px 16px 10px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">السُّلَّم المُنَوْرَق</div>
+  <h1>Penguji Hafalan Matan Sullam Munawwaraq</h1>
+  <p>144 bait — Syaikh Abdurrahman Al-Akhdhori · Tes Hafalan Matan</p>
+</header>
+
+<nav class="tabs">
+  <button data-tab="hafal" class="active">Hafalan Runut</button>
+  <button data-tab="tebaknomor">Tebak Nomor</button>
+  <button data-tab="cari">Cari Kata</button>
+  <button data-tab="potongan">Potongan Kata</button>
+  <button data-tab="jelajah">Jelajah Semua</button>
+</nav>
+
+<main>
+
+  <!-- MODE 1: HAFALAN RUNUT -->
+  <section class="panel active" id="panel-hafal">
+    <div class="meta-row" style="gap:10px;">
+      <div style="flex:1;">
+        <label class="field-label" style="margin-top:0;">Dari bait</label>
+        <input type="number" id="hafalStart" min="1" max="144" value="1">
+      </div>
+      <div style="flex:1;">
+        <label class="field-label" style="margin-top:0;">Sampai bait</label>
+        <input type="number" id="hafalEnd" min="1" max="144" value="144">
+      </div>
+    </div>
+    <div class="card">
+      <div class="meta-row">
+        <span class="fasl-tag" id="hafalFasl"></span>
+        <span class="bait-no" id="hafalNo">1</span>
+      </div>
+      <div class="bait-text reveal-blur" id="hafalText"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-gold" id="hafalReveal">Tampilkan Jawaban</button>
+      <button class="btn btn-primary" id="hafalNext">Bait Berikutnya →</button>
+    </div>
+    <p class="helper">Nomor bait tampil, teks disamarkan. Coba lafalkan/tulis dulu di kepala sebelum menekan "Tampilkan Jawaban".</p>
+  </section>
+
+  <!-- MODE 2: TEBAK NOMOR -->
+  <section class="panel" id="panel-tebaknomor">
+    <div class="meta-row" style="gap:10px;">
+      <div style="flex:1;">
+        <label class="field-label" style="margin-top:0;">Dari bait</label>
+        <input type="number" id="tnRangeStart" min="1" max="144" value="1">
+      </div>
+      <div style="flex:1;">
+        <label class="field-label" style="margin-top:0;">Sampai bait</label>
+        <input type="number" id="tnRangeEnd" min="1" max="144" value="144">
+      </div>
+    </div>
+    <div class="card">
+      <div class="fasl-tag" id="tnFasl"></div>
+      <div class="bait-text" id="tnText"></div>
+    </div>
+    <label class="field-label">Ini bait nomor berapa?</label>
+    <input type="number" id="tnGuess" min="1" max="144" placeholder="Contoh: 27">
+    <div class="btn-row">
+      <button class="btn btn-primary" id="tnCheck">Cek Jawaban</button>
+      <button class="btn btn-ghost" id="tnNext">Soal Baru</button>
+    </div>
+    <div id="tnResult" class="helper"></div>
+    <div class="stat-strip">Skor: <b id="tnScore">0</b>&nbsp;/&nbsp;<span id="tnTotal">0</span>
+      <button class="btn btn-ghost" id="tnReset" style="padding:4px 12px;font-size:0.78rem;">Reset Skor</button>
+    </div>
+  </section>
+
+  <!-- MODE 3: CARI KATA -->
+  <section class="panel" id="panel-cari">
+    <label class="field-label">Ketik satu kata / potongan kata (boleh tanpa harakat)</label>
+    <input type="text" class="arabic-input" id="cariInput" placeholder="مثال: لازم">
+    <p class="helper">Sesuai gaya ujian: penguji sering menyebut satu kata seperti "Waqo'a" atau "Laazimaa" — ketik di sini untuk menemukan semua bait yang memuatnya.</p>
+    <div id="cariResults" class="result-list"></div>
+  </section>
+
+  <!-- MODE 4: POTONGAN KATA -->
+  <section class="panel" id="panel-potongan">
+    <div class="meta-row" style="gap:10px;">
+      <div style="flex:1;">
+        <label class="field-label" style="margin-top:0;">Dari bait</label>
+        <input type="number" id="pkRangeStart" min="1" max="144" value="1">
+      </div>
+      <div style="flex:1;">
+        <label class="field-label" style="margin-top:0;">Sampai bait</label>
+        <input type="number" id="pkRangeEnd" min="1" max="144" value="144">
+      </div>
+    </div>
+    <div class="card">
+      <div class="fasl-tag" id="pkFasl"></div>
+      <p class="helper" style="margin-top:0;">Potongan kata acak dari salah satu bait:</p>
+      <div class="bait-text" id="pkWord" style="font-size:2rem;"></div>
+    </div>
+    <label class="field-label">Tebak nomor baitnya, lalu lanjutkan sambungan baitnya di kepala</label>
+    <input type="number" id="pkGuess" min="1" max="144" placeholder="Nomor bait">
+    <div class="btn-row">
+      <button class="btn btn-primary" id="pkCheck">Cek &amp; Tampilkan Bait</button>
+      <button class="btn btn-ghost" id="pkNext">Kata Baru</button>
+    </div>
+    <div id="pkResult"></div>
+  </section>
+
+  <!-- MODE 5: JELAJAH SEMUA -->
+  <section class="panel" id="panel-jelajah">
+    <label class="field-label">Lompat ke nomor</label>
+    <select id="jelajahSelect"></select>
+    <div id="jelajahList"></div>
+  </section>
+
+</main>
+
+<footer>Teks nazham diambil dari mushannaf klasik Al-Akhdhori (abad 10 H), transliterasi dapat berbeda tipis antar cetakan — cocokkan dengan kitab pegangan Anda.</footer>
+
+<script>
+// ---------- DATA: 144 bait Sullam Munawwaraq ----------
+// fasl: judul pasal BARU yang dimulai SEBELUM bait ini (null jika lanjutan)
+const BAITS = [
+[1,"الحَمْـدُ لِلَّهِ الَّذِي قَـدْ أَخْـرَجَا","نَتَـائِجَ الفِـكْرِ لِأَرْبَـابِ الحِـجَا",null],
+[2,"وَحَـطَّ عَنْهُمْ مِنْ سَمَـاءِ العَقْلِ","كُلَّ حِجَـابٍ مِـنْ سَحَابِ الجَهْلِ",null],
+[3,"حَتَّى بَدَتْ لَهُـمْ شُمُوسُ المَعْرِفَهْ","رَأَوْا مُخَــدَّرَاتِـهَا مُنْكَــشِفَهْ",null],
+[4,"نَحْمَـدُهُ جَـلَّ عَـلَى الإِنْعَامِ","بِنِعْــمَةِ الإِيْمَــانِ وَالإِسْـلاَمِ",null],
+[5,"مَـنْ خَصَّنَا بِخَيْرِ مَنْ قَدْ أُرْسِلاَ","وَخَيْرِ مَـنْ حَـازَ المَقَامَـاتِ العُلاَ",null],
+[6,"مُحَـمَّدٍ سَيِّـدِ كُـلِّ مُقْتَفَى","العَـرَبِيِّ الهَـاشِـمِيِّ المُصْـطَفَى",null],
+[7,"صَـلَّى عَلَيْهِ اللَّهُ مَـادَامَ الحِجَا","يَخُـوضُ مِـنْ بَحْرِ المَعَانِي لُجَجَا",null],
+[8,"وَآلِـهِ وَصَـحْبِهِ ذَوِي الهُدَى","مَـنْ شُبِّهُـوا بِأَنْجُــمٍ في الِاهْتِدَا",null],
+[9,"وَبَعْـدُ فَـالمَنْـطِقُ لِلْـجَنَانِ","نِسْبَتُهُ كَـالنَّحْـــوِ لِلِّسَــانِ",null],
+[10,"فَيَعْصِمُ الأَفْكَارَ عَنْ غَيِّ الخَطَا","وَعَـنْ دَقِيقِ الفَهْـمِ يَكْشِفُ الغِطَا",null],
+[11,"فَهَـاكَ مِنْ أُصُـولِهِ قَوَاعِـدَا","تَجْـمَعُ مِـنْ فُنُـونِهِ فَـوَائِـدَا",null],
+[12,"سَمَّيْـتُهُ بِالسُّلَّــمِ المُنَـوْرَقِ","يُرْقَـى بِـهِ سَمَـاءُ عِلْـمِ المَنْطِقِ",null],
+[13,"وَاللهَ أَرْجُـو أنْ يَكُونَ خَالِصَا","لِـوَجْـهِهِ الكَـرِيمِ لَيْـسَ قَالِصَا",null],
+[14,"وَأَنْ يَكُـونَ نَـافِعًا لِلْمُبْـتَدِي","بِـهِ إِلَــى المُطَـوَّلاَتِ يَهْتَـدِي",null],
+[15,"وَالخُلْـفُ فِي جَـوَازِ الاِشْتِغَالِ بِــهِ","عَـلَى ثَـلاَثَـةٍ أَقْــوَالِ","فَصْلٌ فِي جَوَازِ الاِشْتِغَالِ بِهِ"],
+[16,"فَابْنُ الصَّـلاَحِ وَالنَّوَاوِي حَرَّمَا","وَقَـالَ قَـوْمٌ يَنْبَـغِي أَنْ يُعْـلَمَا",null],
+[17,"وَالقَـوْلَةُ المَشْهُـورَةُ الصَّحِيحَهْ","جَـوَازُهُ لِـكَامِـلِ القَـرِيحَـهْ",null],
+[18,"مُمَـارِسِ السُّـنَّةِ وَالكِتَـابِ","لِيَـهْتَدِي بِـهِ إِلَـى الصَّـوَابِ",null],
+[19,"إِدْرَاكُ مُفْـرَدٍ تَصَـوُّرًا عُـلِمْ","وَدَرْكُ نِسْـبَةٍ بِتَـصْدِيقٍ وُسِـمْ","فَصْلٌ فِي أنْوَاعِ العِلْمِ الحَادِثِ"],
+[20,"وَقَـدِّمِ الأَوَّلَ عِنْـدَ الوَضْـعِ","لِأَنَّــهُ مُقَــدَّمٌ بِـالطَّبْــعِ",null],
+[21,"وَالنَّظَـرِي مَا احْتَاجَ لِلتَّـأَمُّلِ","وَعَكْسُـهُ هُـوَ الضَّرُورِيُّ الجَلِي",null],
+[22,"وَمَـا بِهِ إِلَى تَصَـوُّرٍ وُصِلْ","يُدْعَـى بِقَـوْلٍ شَـارِحٍ فَلْتَبْتَهِلْ",null],
+[23,"وَمَـا لِتَصْـدِيقٍ بِهِ تُوُصِّـلاَ","بِحُـجَّةٍ يُعْـرَفُ عِنْـدَ العُقَـلاَ",null],
+[24,"دَلَالَـةُ اللَّفْـظِ عَلَى مَا وَافَقَهْ","يَدْعُـونَـهَا دَلاَلَـةَ المُطَـابَقَـهْ","فَصْلٌ فِي أَنْوَاعِ الدَّلاَلَةِ الوَضْعِيَّةِ"],
+[25,"وَجُـزْئِهِ تَضَمُّنًا وَمَـا لَـزِمْ","فَهْـوَ التِـزَامٌ إِنْ بِعَقْـلٍ التُـزِمْ",null],
+[26,"مُسْتَعْمَلُ الأَلفَاظِ حَيْثُ يُوجَدُ","إِمَّـا مُـرَكَّـبٌ وَإِمَّـا مُفْـرَدُ","فَصْلٌ فِي مَبَاحِثِ الأَلْفَاظِ"],
+[27,"فَـأَوَّلٌ مَـا دَلَّ جُزْؤُهُ عَلَـى","جُـزُءِ مَعْنَـاهُ بِعَـكْسِ مَـا تَلاَ",null],
+[28,"وَهْوَ عَلَى قِسْمَيْنِ أَعْنِي المُفْرَدَا","كُلِّـيٌّ اوْ جُـزْئِيُّ حَيْثُ وُجِـدَا",null],
+[29,"فَمُفْـهِمُ اشْـتِرَاكٍ الـكُلِّيُّ","كَـأَسَـدٍ وَعَكْـسُهُ الجُــزْئِِيُّ",null],
+[30,"وَأَوَّلاً لِلذَّاتِ إِنْ فِيهَا انْدَرَجْ","فَانْسُـبْهُ أَوْ لِعَـارِضٍ إذَا خَـرَجْ",null],
+[31,"وَالكُلِّيَاتُ خَمْسَةٌ دُونَ انْتِقَاصْ","جِنْسٌ وَفَـصْلٌ عَرَضٌ نَوْعٌ وَخَاصْ",null],
+[32,"وَأَوَّلٌ ثَلَاثَـةٌ بِـلاَ شَطَـطْ","جِنْـسٌ قَرِيبٌ أَوْ بَعِيـدٌ أَوْ وَسَطْ",null],
+[33,"وَنِسْبَةُ الأَلْفَـاظِ لِلْمَعَـانِي","خَمْـسَةُ أَقْسَـامٍ بِـلاَ نُقْصَـانِ","فَصْلٌ فِي نِسْبَةِ الأَلْفَاظِ لِلْمَعَانِي"],
+[34,"تَوَاطُـؤٌ تَشَـاكُكٌ تَخَالُفُ","وَالِاشْـتِرَاكُ عَكْـسُهُ التَّـرَادُفُ",null],
+[35,"وَاللَّفْـظُ إِمَّـا طَلَبٌ أَوْ خَبَرُ","وَأَوَّلٌ ثَـلَاثَــةٌ سَتُـذْكَــرُ",null],
+[36,"أَمْـرٌ مَعَ اسْتِعْلاَ وَعَكْسُهُ دُعَا","وَفِي التَّسَـاوِي فَالْتِمَـاسٌ وَقَـعَا",null],
+[37,"الكُـلُّ حُكْمُنَا عَلَى المَجْمُوعِ","كَـكُلُّ ذَاكَ لَيْــسَ ذَا وُقُـوعِ","فَصْلٌ فِي بَيَانِ الكُلِّ وَالكُلِّيَّةِ وَالجُزْءِ وَالجُزْئِيّةِ"],
+[38,"وَحَيْثُمَا لِكُـلِّ فَـرْدٍ حُكِمَا","فَـإِنَّـهُ كُلِّـيَّةٌ قَــدْ عُلِـمَا",null],
+[39,"وَالحُكْـمُ لِلْبَعْضِ هُوَ الجُزْئِيَّهْ","وَالجُــزْءُ مَعْـرِفَـتُهُ جَـلِـيَّهْ",null],
+[40,"مُعَـرِّفٌ عَلَى ثَلاَثَـةٍ قُسِـمْ","حَـدٌّ وَرَسْـمِيٌّ وَلَفْـظِيٌّ عُـلِمْ","فَصْلٌ فِي المُعَرِّفاتِ"],
+[41,"فَالحَـدُّ بِالْجِنْسِ وَفَصْـلٍ وَقَعَا","وَالرَّسْـمُ بِالْجِِـنْسِ وَخَـاصَةٍ مَعَا",null],
+[42,"وَنَاقِـصُ الحَدِّ بِفَصْلٍ أَوْ مَـعَا","جِنْـسٍ بَعيِــدٍ لاَ قَـرِيبٍ وَقَـعَا",null],
+[43,"وَنَاقِـصُ الرَّسْمِ بِخَاصَةٍ فَقَـطْ","أَوْ مَـعَ جِنْـسٍ أَبْعَـدٍ قَدِ ارْتَبَطْ",null],
+[44,"وَمَـا بِلَفْـظِيٍّ لَدَيْهِمْ شُـهِرَا","تَبْـدِيـلُ لَفْـظٍ بِرَدِيـفٍ أَشْهَرَا",null],
+[45,"وَشَـرْطُ كُـلٍّ أَنْ يُرَى مُطَّرِدَا","مُنْعَكِـسًا وَظَـاهِـرًا لاَ أَبْعَـدَا",null],
+[46,"وَلاَ مُسَـاوِيًـا وَلاَ تَجَـوُّزَا","بِـلاَ قَــرِينَةٍ بِـهَا تُحُــرِّزَا",null],
+[47,"وَلاَ بِمَـا يُدْرَى بِمَحْدُودٍ وَلاَ","مُشْـتَرَكٍ مِـنَ القَــرِينَةِ خَـلاَ",null],
+[48,"وَعِنْـدَهُمْ مِنْ جُمْـلَةِ المَرْدُودِ","أَنْ تَدْخُـلَ الأَحْكـَامُ فِـي الحُدُودِ",null],
+[49,"وَلاَ يَجُوزُ فِي الحُـدُودِ ذِكْرُ أَوْ","وَجَـائِزٌ فِي الرَّسْـمِ فَادْرِ مَا رَوَوْا",null],
+[50,"مَا احْتَمَلَ الصِّـدْقَ لِذَاتِهِ جَرَى","بَيْنَهُــمُ قَضِــيَّةً وَخَــبَرَا","بَابُ القَضَايَا وَأَحْكَامِهَا"],
+[51,"ثُّمَ القَضَـايَا عِنْدَهُـمْ قِسْمَانِ","شَـرْطِـيَّةٌ حَمْـلِيَّةٌ وَالثَّـانِـي",null],
+[52,"كُلِّــيَّةٌ شَخْــصِيَّةٌ وَالأَوَّلُ","إِمَّــا مُسَـوَّرٌ وَإِمَّـا مُهْـمَلُ",null],
+[53,"وَالسُّـورُ كُلِّيًّا وَجُـزْئِيًّا يُرَى","وَأَرْبَـعٌ أَقْسَـامُـهُ حَيْثُ جَـرَى",null],
+[54,"إِمَّـا بِكُلٍّ أَوْ بِبَعْـضٍ أَوْ بِلاَ","شَـيءٍ وَلَيْـسَ بَعْضُ أَوْ شِبْهٍ جَلاَ",null],
+[55,"وَكُلُّـهَا مُوجَـبَةٌ وَسَـالِبَهْ","فَهْـيَ إِذَنْ إِلَـى الثَّـمَانِ آيِـبَهْ",null],
+[56,"وَالأَوَّلُ المَوْضُـوعُ فِي الحَمْلِيَّهْ","وَالآخِـرُ المَحْـمُولُ بِـالسَّـوِيَّهْ",null],
+[57,"وَإِنْ عَلَى التَّعْلِيقِ فِيهَا قَدْ حُكِمْ","فَـإِنَّـهَا شَـرْطِـيَّةٌ وَتَنْقَـسِمْ",null],
+[58,"أَيْـضًا إِلَـى شَرْطِـيَّةٍ مُتَّصِلَهْ","وَمِثْـلِهَا شَـرْطِـيَّةٍ مُنْفَـصِلَـهْ",null],
+[59,"جُـزْآهُمَا مُقَـدَّمٌ وَتَـالِـي","أَمَّــا بَيَــانُ ذَاتِ الِاتِّصَـالِ",null],
+[60,"مَـا أَوْجَبَتْ تَـلاَزُمَ الجُزْأَيْنِ","وَذَاتُ الِانْفِصَــالِ دُونَ مَيْــنِ",null],
+[61,"مَـا أَوْجَبَتْ تَنَافُـرًا بَيْنَهُمَا","أَقْسَـامُـهَا ثَـلاَثَـةٌ فَلْتُـعْلَـمَا",null],
+[62,"مَـانِعُ جَمْعٍ أَوْ خُلُوٍّ أَوْ هُمَا","وَهْـوَ الحَقِيـقِيُّ الأَخَـصُّ فَاعْلَمَا",null],
+[63,"تَنَاقُـضٌ خُلْفُ القَضِيَّتَيْنِ فِي","كَيْـفٍ وَصِـدْقُ وَاحِـدٍ أَمْرٌ قُفِي","فَصْلٌ فِي التَّنَاقُضِ"],
+[64,"فَـإِنْ تَكُنْ شَخْصـِيَّةً أَوْ مُهْمَلَهْ","فَنَقْـضُهَا بِالـكَيْفِ أَنْ تُبَـدِّلَـهْ",null],
+[65,"وَإِنْ تَكُنْ مَحْصُـورَةً بِالسُّـورِ","فانْقُـضْ بِضِـدِّ سُورِهَـا المَذْكُورِ",null],
+[66,"فََـإِنْ تَكُـنْ مُوجَبَـةً كُلِّـيَّهْ","نَقِيضُهَـا سَـالِبَـةٌ جُــزْئِيَّـهْ",null],
+[67,"وَإِنْ تَكُـنْ سَـالِبَـةً كُلِّـيَّهْ","نَقِيضُـهَا مُـوجَـبَةٌ جُـزْئِيَّـهْ",null],
+[68,"العَكْـسُ قَلْبُ جُـزْأَيِ القَضِِيَّهْ","مَـعَ بَقَـاءِ الصِّـدْقِ وَالكَـيْفِيَّهْ","فَصْلٌ فِي العَكْسِ المُسْتَوِي"],
+[69,"وَالكَـمِّ إِلاَّ المُـوجَبَ الكُـلِّيَّهْ","فَعَـوْضُـهَا المُوجَـبَةُ الجُـزْئِيَّـهْ",null],
+[70,"وَالعَكْـسُ لاَزِمٌ لِغَيْرِ مَـا وُجِدْ","بِـهِ اجْتِمَـاعُ الخِسَّـتَيْنِ فَاقْتَصِدْ",null],
+[71,"وَمِثْـلُهَـا المُهْمَـلَةُ السَّلْـبِيَّهْ","لِأَنَّهَــا فِـي قُـوَّةِ الجُـزْئِيَّـهْ",null],
+[72,"وَالعَكْـسُ فِـي مُرَتَّبٍ بِالطَّبْعِ","وَلَيْـسَ فِـي مُـرَتَّبٍ بِالوَضْـعِ",null],
+[73,"إِنَّ القِيَـاسَ مِنْ قَضَـايَا صُوِّرَا","مُسْتَـلْزِمًـا بِالـذَّاتِ قَوْلاً آخَرَا","بَابٌ فِي القِيَاسِ"],
+[74,"ثُمَّ القِيَـاسُ عِنْدَهُـمْ قِسْـمَانِ","فَمِـنْهُ مَـا يُدْعَـى بِالِاقْـتِرَانِي",null],
+[75,"وَهْـوَ الَّذِي دَلَّ عَلَى النَّـتِيجَةِ","بِقُـوَّةٍ وَاخْـتَصَّ بِـالحَمْـلِيَّـةِ",null],
+[76,"فَـإِنْ تُـرِدْ تَرْكِـيبَهُ فَرَكِّبَـا","مُقَـدِّمَـاتِـهِ عَـلَى مَـا وَجَبَا",null],
+[77,"وَرَتِّـبِ المُقَـدِّمَاتِ وَانْـظُرَا","صَحِيـحَهَا مِـنْ فَـاسِدٍ مُخْتَبِرَا",null],
+[78,"فَـإِنَّ لاَزِمَ المُقَـدِّمَـــاتِ","بِحَسَـبِ المُقَـدِّمَـــاتِ آتِ",null],
+[79,"وَمَـا مِنَ المُقَدِّمَـاتِ صُغْـرَى","فَيَجِـبُ انْدِرَاجُـهَا فِي الكُبْرَى",null],
+[80,"وَذَاتُ حَـدٍّ أصْـغَرٍ صُغْـرَاهُمَا","وَذَاتُ حَــدٍّ أَكْبَرٍ كُبْـرَاهُمَا",null],
+[81,"وَأَصْـغَرٌ فَــذَاكَ ذُو انْـدِرَاجِ","وَوَسَـطٌ يُلْـغَى لَـدَى الإِنْتَاجِ",null],
+[82,"الشَّكْـلُ عِنْـدَ هَؤُلاَءِ النَّـاسِ","يُطْـلَقُ عَـنْ قَضِيَّـتَىْ قِيَـاسِ","فَصْلٌ فِي الأَشْكَالِ"],
+[83,"مِـنْ غَيْرِ أَنْ تُعْتَـبَرَ الأَسْـوَارُ","إِذْ ذَاكَ بِالضَّـرْبِ لَـهُ يُشَـارُ",null],
+[84,"وَلِلْمُقَدِّمَـاتِ أَشْكَـالٌ فَقَـطْ","أَرْبَعَةٌ بِحَسَـبِ الحَـدِّ الوَسَطْ",null],
+[85,"حَمْـلٌ بِصُغْرَى وَضْعُهُ بِكُبْرَى","يُدْعَـى بِشَكْـلٍ أَوَّلٍ وَيُـدْرَى",null],
+[86,"وَحَمْلُهُ فِي الكُلِّ ثَانِيـًا عُرِفْ","وَوَضْعُهُ فِي الكُـلِّ ثَالِثًـا أُلِفْ",null],
+[87,"وَرَابِعُ الأَشْكَالِ عَكْسُ الأَوَّلِ","وَهْيَ عَلَى التَّرْتِيبِ فِي التَّكَـمُّلِ",null],
+[88,"فَحَيْثُ عَنْ هَـذَا النِّظَامِ يُعْدَلُ","فَفَاسِـدُ النِّظَـامِ أَمَّـا الأَوَّلُ",null],
+[89,"فَشَرْطُهُ الإِيجَـابُ فِي صُغْرَاهُ","وَأَنْ تُـرَى كُلِّــيَّةً كُبْــرَاهُ",null],
+[90,"وَالثَّانِ أنْ يَخْتَلِفَا فِي الكَيْفِ مَعْ","كُلِّيَّةِ الكُبْـرَى لَـهُ شَـرْطٌ وَقَعْ",null],
+[91,"وَالثَّالِثُ الإِيجَابُ فِي صُغْرَاهُمَا","وَأَنْ تُرَى كُلِّـيَّةً إِحْــدَاهُمَـا",null],
+[92,"وَرَابِعٌ عَـدَمُ جَمْعِ الخِسَّـتَيْنْ","إِلاَّ بِصُـورَةٍ فَفِيهَــا يَسْـتَبِينْ",null],
+[93,"صُغْـرَاهُمَا مُـوجَبَةٌ جُزْئِـيِّهْ","كُبْــرَاهُمَـا سَالِــبَةٌ كُلِّــيَّهْ",null],
+[94,"فَمُنْــتِجٌ لِأَوَّلٍ أَرْبَــعَةُ","كَـالثَّـانِ ثُمَّ ثَالِـثٌ فَسِـتَّةُ",null],
+[95,"وَرَابِـعٌ بِخَمْـسَةٍ قَدْ أَنْتَجَا","وَغَيْـرُ مَـا ذَكَـرْتُهُ لَـنْ يُنْتِجَا",null],
+[96,"وَتَتْبَعُ النَّتِيْـجَةُ الأَخَسَّ مِـنْ","تِلْـكَ المُقَـدِّمَـاتِ هَكَـذَا زُكِنْ",null],
+[97,"وَهَـذِهِ الأَشْكَـالُ بِالحَـمْلِىِّ","مُخْتَصَّـةٌ وَلَيْـسَ بِالشَّـرْطِـيِّ",null],
+[98,"وَالحَـذْفُ فِي بَعْـضِ المُقَدِّمَاتِ","أَوِ النَّتِــيْجَةِ لِعِــلْمٍ آتٍ",null],
+[99,"وَتَنْتَـهِي إِلَى ضَـرُورَةٍ لِمَـا","مِـنْ دَوْرٍ اوْ تَسَلْـسُلٍ قَـدْ لَزِمَـا",null],
+[100,"وَمِنْـهُ مَـا يُدْعَى بِالِاسْتِثْنَائِي","يُعْـرَفُ بِالشَّـرْطِي بِـلاَ امْتِـرَاءِ","فَصْلٌ فِي القِيَاسِ الِاسْتِثْنَائِيِّ"],
+[101,"وَهْوَ الَّذِي دَلَّ عَـلَى النَّتِيجَةِ","أَوْ ضِـدِّهَـا بِالفِـعْلِ لاَ بِالقُـوَّةِ",null],
+[102,"فَـإِنْ يَكُ الشَّرْطِيُّ ذَا اتِّصَالِ","أَنْتَـجَ وَضْـعُ ذَاكَ وَضْـعَ التَّالِي",null],
+[103,"وَرَفْـعُ تَـالٍ رَفْعَ أَوَّلٍ وَلاَ","يَلْـزَمُ فِي عَكْسِـهِمَا لِمَا انْجَلَى",null],
+[104,"وَإِنْ يَكُنْ مُنْفَصِلاً فَوَضْعُ ذَا","يُنْـتِجُ رَفْـعَ ذَاكَ وَالعَكْـسُ كَذَا",null],
+[105,"وَذَاكَ فِي الأَخَصِّ ثُمَّ إِنْ يَكُنْ","مَـانِعَ جَمْـعٍ فَبِوَضْـعِ ذَا زُكِنْ",null],
+[106,"رَفْعٌ لِذَاكَ دُونَ عَكْسٍ وَإِذَا","مَـانِعَ رَفْـعٍ كَانَ فَهْوَ عَكْسُ ذَا",null],
+[107,"وَمِنْـهُ مَـا يَدْعُونَهُ مُرَكَّبَا","لِكَـوْنِهِ مِـنْ حُجَـجٍ قَـدْ رُكِّبَا","فَصْلٌ فِي لَوَاحِقِ القِيَاسِ"],
+[108,"فَرَكِّبَـنْهُ إِنْ تُرِدْ أَنْ تَعْلَمَهْ","وَاقْـلِبْ نَتِيـجَةً بِـهِ مُقَـدِّمَـهْ",null],
+[109,"يَلْـزَمُ مِنْ تَرْكِيبِهَا بِأُخْرَى","نَتِيْـجَةٌ إِلَـى هَلُـمَّ جَــرَّا",null],
+[110,"مُتَّصِلَ النَّتَائِجِ الَّذِي حَوَى","يَكُـونُ أَوْ مَفْصُـولَهَا كُلٌّ سَوَا",null],
+[111,"وَإِنْ بِجُزْئِيٍّ عَلَى كُلِّي اسْتُدِلْ","فَـذَا بِالِاسْتِقْـرَاءِ عِنْـدَهُمْ عُقِلْ",null],
+[112,"وَعَكْسُهُ يُدْعَى القِيَاسَ المَنْطِقِي","وَهْـوَ الَّـذِي قَدَّمْـتُهُ فَحَقِّـقِ",null],
+[113,"وَحَيْثُ جُزْئِيٌّ عَلَى جُزْئِيْ حُمِلْ","لِجَـامِعٍ فَـذَاكَ تَمْثِـيلٌ جُـعِلْ",null],
+[114,"وَلاَ يُفِيـدُ القَطْـعَ بِالدَّلِـيلِ","قِيَـاسُ الِاسْتِقْـرَاءِ وَالتَّمْـثِيلِ",null],
+[115,"وَحُجَّـةٌ نَقْلِـيَّةٌ عَقْلِــيَّهْ","أَقْسَـامُ هَـذِي خَمْـسَةٌ جَلِـيَّهْ","فَصْلٌ فِي أَقْسَامِ الحُجَّةِ"],
+[116,"خَطَـابَةٌ شِعْـرٌ وَبُرْهَانٌ جَدَلْ","وَخَـامِسٌ سَفْسَـطَةٌ نِلْتَ الأَمَلْ",null],
+[117,"أَجَلُّهَـا البُرْهَـانُ مَا أُلِّفَ مِنْ","مُقَـدِّمَـاتٍ بِـاليَقِـينِ تَقْـتَرِنْ",null],
+[118,"مِـنْ أَوَّلِيَّـاتٍ مُشَاهَـدَاتِ","مُجَــرَّبَـاتٍ مُتَــوَاتِـرَاتِ",null],
+[119,"وَحَـدَسِيَّـاتٍ وَمَحْسُوسَاتِ","فَتِلْـكَ جُمْــلَةُ اليَقِيـنِيَّاتِ",null],
+[120,"وَفِـي دَلاَلَـةِ المُقَـدِّمَـاتِ","عَـلَى النَّتِـيجَـةِ خِـلاَفٌ آتِ",null],
+[121,"عَقْـلِيٌّ اوْ عَـادِيٌّ اوْ تَوَلُّـدُ","أَوْ وَاجِـبٌ وَالأَوَّلُ المُـؤَيَّـدُ",null],
+[122,"وَخَـطَأُ البُرْهَانِ حَيْثُ وُجِدَا","فِـي مَـادَةٍ أَوْ صُـورَةٍ فَالمُبْتَدَا","خَاتِمَةٌ"],
+[123,"فِي اللَّفْظِ كَاشْتِرَاكٍ اوْ كَجَعْلِ ذَا","تَبَـايُنٍ مِثْـلَ الرَّدِيـفِ مَأْخَـذَا",null],
+[124,"وَفِي المَعَـانِي لِالتِبَاسِ الكَاذِبَهْ","بِـذَاتِ صِـدْقٍ فَافْهَـمِ المُخَاطَبَهْ",null],
+[125,"كَمِثْلِ جَعْلِ العَرَضِي كَالـذَّاتِي","أَوْ نَـاتِجٍ إِحْـدَى المُقَـدِّمَـاتِ",null],
+[126,"وَالحُكْمُ لِلْجِنْسِ بِحُكْمِ النَّـوْعِ","وَجَعْـلُ كَالقَطْـعِيِّ غَيْرِ القَطْعِي",null],
+[127,"وَالثَّانِ كَالخُـرُوجِ عَـنْ أَشْكَالِهِ","وَتَرْكِ شَـرْطِ النَّتْـجِ مِنْ إِكْمَالِهِ",null],
+[128,"هَـذَا تَمَـامُ الغَـرَضِ المَقْصُودِ","مِـنْ أُمَّهَـاتِ المَنْـطِقِ المَحْمُودِ",null],
+[129,"قَـدِ انْتَهَى بِحَمْـدِ رَبِّ الفَـلَقِ","مَـا رُمْـتُهُ مِنْ فَنِّ عِـلْمِ المَنْطِقِ",null],
+[130,"نَظَمَـهُ العَبْـدُ الذَّلِيـلُ المُفْتَـقِرْ","لِرَحْمَـةِ المَـوْلَى العَظِيمِ المُقْتَدِرْ",null],
+[131,"الأَخْضَـرِيُّ عَابِـدُ الرَّحْمَـنِ","المُـرْتَجِـي مِـنْ رَبِّـهِ المَنَّـانِ",null],
+[132,"مَغْفِـرَةً تُحِيـطُ بِـالذُّنُـوبِ","وَتَكْشِـفُ الغِـطَا عَنِ القُلُوبِ",null],
+[133,"وَأَنْ يُثِيـبَنَا بِجَنَّـةِ العُــلاَ","فَإِنَّـهُ أَكْــرَمُ مِـنْ تَفَـضَّلاَ",null],
+[134,"وَكُنْ أَخِي لِلمُبْتَدِي مُسَامِـحَا","وَكُـنْ لِإِصْلاَحِ الفَسَادِ نَاصِحَا",null],
+[135,"وَأَصْلِـحِ الفَسَـادَ بِالتَّـأَمُّـلِ","وَإِنْ بَـدِيهَـةً فَـلاَ تُبَـدِّلِ",null],
+[136,"إِذْ قِيـلَ كَـمْ مُزَيِّفٍ صَحِيحَا","لِأَجْـلِ كَـوْنِ فَهْـمِهِ قَبيِحَـا",null],
+[137,"وَقُلْ لِمنْ لَمْ يَنْتَصِفْ لِمَقْصِدِي","العُـذْرُ حَـقٌّ وَاجِـبٌ لِلمُبْتَدِي",null],
+[138,"وَلِبَنِي إِحْـدَى وَعِشْـرِينَ سَنَهْ","مَعْـذِرَةٌ مَقْبُـولَةٌ مُسْتَـحْسَنَـهْ",null],
+[139,"لَاسِيَّـمَا فِي عَـاشِرِ القُـرُونِ","ذِي الجَهْـلِ وَالفَسَـادِ وَالفُتُـونِ",null],
+[140,"وَكَـانَ فِـي أَوَائِـلِ المُحَـرَّمِ","تَأْلِيـفُ هَـذَا الرَّجَـزِ المُنَظَّـمِ",null],
+[141,"مِـنْ سَنَـةٍ إِحْـدَى وَأَرْبَعِينَ","مِـنْ بَعْـدِ تِسْعَـةٍ مِـنَ المِئِينَ",null],
+[142,"ثُمَّ الصَّـلاَةُ وَالسَّـلاَمُ سَرْمَدَا","عَـلَى رَسُـولِ اللهِ خَيْرِ مَنْ هَدَى",null],
+[143,"وَآلِـهِ وَصَحْبِـهِ الثِّقَـاتِ","السَّـالِكِـينَ سُبُـلَ النَّجَــاةِ",null],
+[144,"مَا قَطَعَتْ شَمْسُ النَّهَارِ أَبْرُجَا","وَطَلَـعَ البَدْرُ المُنِيرُ فِي الـدُّجَى",null]
+];
+
+// carry-forward fasl label for every bait (for display context)
+(function(){
+  let cur = "";
+  for(const b of BAITS){
+    if(b[3]) cur = b[3];
+    b[3] = cur;
+  }
+})();
+
+function normalizeAr(s){
+  // strip harakat/tashkeel + tatweel, unify alef/ya forms for loose matching
+  return s
+    .replace(/[\u064B-\u0652\u0670\u0640]/g,'')
+    .replace(/[إأآا]/g,'ا')
+    .replace(/ى/g,'ي')
+    .replace(/ة/g,'ه')
+    .trim();
+}
+
+function fullText(b){ return b[1]+" "+b[2]; }
+
+// ---------- TAB SWITCHING ----------
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---------- MODE 1: HAFALAN RUNUT ----------
+let hafalIdx = 0;
+function hafalRange(){
+  let s = Math.min(Math.max(parseInt(document.getElementById('hafalStart').value)||1,1),144);
+  let e = Math.min(Math.max(parseInt(document.getElementById('hafalEnd').value)||144,1),144);
+  if(e < s) e = s;
+  return [s,e];
+}
+function renderHafal(){
+  const b = BAITS[hafalIdx];
+  document.getElementById('hafalFasl').textContent = b[3];
+  document.getElementById('hafalNo').textContent = b[0];
+  const el = document.getElementById('hafalText');
+  el.innerHTML = `<span class="shatr">${b[1]}</span><span class="shatr">${b[2]}</span>`;
+  el.classList.remove('shown');
+}
+document.getElementById('hafalStart').addEventListener('change', e=>{
+  const [s,en] = hafalRange();
+  hafalIdx = s-1;
+  renderHafal();
+});
+document.getElementById('hafalEnd').addEventListener('change', ()=>{ hafalRange(); });
+document.getElementById('hafalReveal').addEventListener('click', ()=>{
+  document.getElementById('hafalText').classList.toggle('shown');
+});
+document.getElementById('hafalNext').addEventListener('click', ()=>{
+  const [s,e] = hafalRange();
+  let nextNo = hafalIdx+2; // current bait number +1
+  if(nextNo > e) nextNo = s;
+  hafalIdx = nextNo-1;
+  document.getElementById('hafalStart').value = hafalIdx+1;
+  renderHafal();
+});
+renderHafal();
+
+// ---------- MODE 2: TEBAK NOMOR ----------
+let tnCurrent = null, tnScore = 0, tnTotal = 0;
+function tnRange(){
+  let s = Math.min(Math.max(parseInt(document.getElementById('tnRangeStart').value)||1,1),144);
+  let e = Math.min(Math.max(parseInt(document.getElementById('tnRangeEnd').value)||144,1),144);
+  if(e < s) e = s;
+  return [s,e];
+}
+function newTn(){
+  const [s,e] = tnRange();
+  const no = s + Math.floor(Math.random()*(e-s+1));
+  tnCurrent = BAITS[no-1];
+  document.getElementById('tnFasl').textContent = tnCurrent[3];
+  document.getElementById('tnText').innerHTML = `<span class="shatr">${tnCurrent[1]}</span><span class="shatr">${tnCurrent[2]}</span>`;
+  document.getElementById('tnGuess').value = '';
+  document.getElementById('tnResult').innerHTML = '';
+}
+document.getElementById('tnCheck').addEventListener('click', ()=>{
+  const g = parseInt(document.getElementById('tnGuess').value);
+  if(!g) return;
+  tnTotal++;
+  if(g === tnCurrent[0]){
+    tnScore++;
+    document.getElementById('tnResult').innerHTML = `<span class="badge-correct">Benar — ini bait ke-${tnCurrent[0]}.</span>`;
+  } else {
+    document.getElementById('tnResult').innerHTML = `<span class="badge-wrong">Belum tepat.</span> Ini sebenarnya bait ke-${tnCurrent[0]}, bukan ${g}.`;
+  }
+  document.getElementById('tnScore').textContent = tnScore;
+  document.getElementById('tnTotal').textContent = tnTotal;
+});
+document.getElementById('tnNext').addEventListener('click', newTn);
+document.getElementById('tnReset').addEventListener('click', ()=>{
+  tnScore = 0; tnTotal = 0;
+  document.getElementById('tnScore').textContent = tnScore;
+  document.getElementById('tnTotal').textContent = tnTotal;
+  document.getElementById('tnResult').innerHTML = '';
+});
+newTn();
+
+// ---------- MODE 3: CARI KATA ----------
+function renderCari(){
+  const raw = document.getElementById('cariInput').value.trim();
+  const box = document.getElementById('cariResults');
+  if(!raw){ box.innerHTML = ''; return; }
+  const needle = normalizeAr(raw);
+  const matches = BAITS.filter(b => normalizeAr(fullText(b)).includes(needle));
+  if(matches.length === 0){
+    box.innerHTML = `<div class="empty-note">Tidak ditemukan bait yang memuat kata itu. Coba tanpa harakat, atau potongan kata yang lebih pendek.</div>`;
+    return;
+  }
+  box.innerHTML = matches.map(b=>{
+    const hi = (txt)=>{
+      const norm = normalizeAr(txt);
+      const idx = norm.indexOf(needle);
+      if(idx === -1) return txt;
+      // best-effort highlight by proportional mapping is unreliable with normalization,
+      // so just wrap whole shatr containing the match lightly via CSS class instead.
+      return txt;
+    };
+    const has1 = normalizeAr(b[1]).includes(needle);
+    const has2 = normalizeAr(b[2]).includes(needle);
+    return `<div class="result-item">
+      <div class="rno">Bait ${b[0]} &middot; ${b[3]}</div>
+      <div class="rtext"><span style="${has1?'background:rgba(172,125,46,.28);border-radius:4px;':''}">${b[1]}</span><br>
+      <span style="${has2?'background:rgba(172,125,46,.28);border-radius:4px;':''}">${b[2]}</span></div>
+    </div>`;
+  }).join('');
+}
+document.getElementById('cariInput').addEventListener('input', renderCari);
+
+// ---------- MODE 4: POTONGAN KATA ----------
+// index: normalized word -> Set of bait numbers containing it (whole-word match)
+const WORD_INDEX = {};
+BAITS.forEach(b=>{
+  fullText(b).split(/\s+/).forEach(w=>{
+    const n = normalizeAr(w);
+    if(n.length < 2) return;
+    if(!WORD_INDEX[n]) WORD_INDEX[n] = new Set();
+    WORD_INDEX[n].add(b[0]);
+  });
+});
+
+let pkCurrent = null, pkWord = null, pkMatches = [];
+function pkRange(){
+  let s = Math.min(Math.max(parseInt(document.getElementById('pkRangeStart').value)||1,1),144);
+  let e = Math.min(Math.max(parseInt(document.getElementById('pkRangeEnd').value)||144,1),144);
+  if(e < s) e = s;
+  return [s,e];
+}
+function newPk(){
+  const [s,e] = pkRange();
+  const no = s + Math.floor(Math.random()*(e-s+1));
+  pkCurrent = BAITS[no-1];
+  const words = fullText(pkCurrent).split(/\s+/).filter(w=>normalizeAr(w).length>=2);
+  pkWord = words[Math.floor(Math.random()*words.length)];
+  pkMatches = Array.from(WORD_INDEX[normalizeAr(pkWord)]).sort((a,b)=>a-b);
+  document.getElementById('pkFasl').textContent = pkCurrent[3];
+  document.getElementById('pkWord').className = 'bait-text arabic';
+  document.getElementById('pkWord').textContent = pkWord;
+  document.getElementById('pkGuess').value = '';
+  document.getElementById('pkResult').innerHTML = '';
+}
+document.getElementById('pkCheck').addEventListener('click', ()=>{
+  const g = parseInt(document.getElementById('pkGuess').value);
+  const resultBox = document.getElementById('pkResult');
+  if(!g){ resultBox.innerHTML = ''; return; }
+  const isCorrect = pkMatches.includes(g);
+  const statusHtml = isCorrect
+    ? `<p class="badge-correct" style="margin:10px 0 0;">Benar! Kata ini memang ada di bait ${g}.</p>`
+    : `<p class="badge-wrong" style="margin:10px 0 0;">Bukan bait ${g}. Kata ini ada di bait: ${pkMatches.join(', ')}.</p>`;
+  const cardsHtml = pkMatches.map(no=>{
+    const b = BAITS[no-1];
+    return `<div class="card" style="margin-top:8px;">
+      <div class="meta-row"><span class="fasl-tag">${b[3]}</span><span class="bait-no">${b[0]}</span></div>
+      <div class="bait-text"><span class="shatr">${b[1]}</span><span class="shatr">${b[2]}</span></div>
+    </div>`;
+  }).join('');
+  resultBox.innerHTML = statusHtml + (pkMatches.length>1
+    ? `<p class="helper" style="margin:10px 0 0;">Kata ini muncul di ${pkMatches.length} bait berbeda — semuanya ditampilkan di bawah.</p>${cardsHtml}`
+    : cardsHtml);
+});
+document.getElementById('pkNext').addEventListener('click', newPk);
+newPk();
+
+// ---------- MODE 5: JELAJAH SEMUA ----------
+const jelajahSelect = document.getElementById('jelajahSelect');
+jelajahSelect.innerHTML = BAITS.map(b=>`<option value="${b[0]}">Bait ${b[0]}</option>`).join('');
+function renderJelajah(){
+  const startNo = parseInt(jelajahSelect.value)||1;
+  const startIdx = startNo-1;
+  const slice = BAITS.slice(startIdx, startIdx+8);
+  document.getElementById('jelajahList').innerHTML = slice.map(b=>`
+    <div class="card">
+      <div class="meta-row"><span class="fasl-tag">${b[3]}</span><span class="bait-no">${b[0]}</span></div>
+      <div class="bait-text"><span class="shatr">${b[1]}</span><span class="shatr">${b[2]}</span></div>
+    </div>`).join('');
+}
+jelajahSelect.addEventListener('change', renderJelajah);
+renderJelajah();
+</script>
+</body>
+</html>
